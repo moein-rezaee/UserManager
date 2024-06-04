@@ -4,13 +4,14 @@ namespace CustomResponce
 {
     public class CustomErrors
     {
-        public static Result InvalidInputData() => new()
+        public static Result InvalidInputData(object? data = null) => new()
         {
             Message = new()
             {
                 Fa = "پارامترهای ورودی معتبر نمی باشد",
                 En = "Invalid Input Data"
             },
+            Data = data,
             StatusCode = StatusCodes.Status400BadRequest,
             Status = false
         };

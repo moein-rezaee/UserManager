@@ -17,17 +17,14 @@ namespace UserManager.Services
 
         private async Task<Result> CreateUser(Guid OrganizationId, string Username)
         {
-            FetchRequestOptions options = new()
+            string Url = $@"/api/authenticate/v1/user/create";
+            var Data = new GenerateTokenDto()
             {
-                Url = $@"/api/authenticate/v1/user/create-user",
-                Data = new GenerateTokenDto()
-                {
-                    OrganizationId = OrganizationId,
-                    Username = Username,
-                    Password = Username
-                }
+                OrganizationId = OrganizationId,
+                Username = Username,
+                Password = Username
             };
-            return await _fetch.Get(options);
+            return await _fetch.Post(Url, Data);
         }
 
         private async Task<Result> GenerateToken(Guid OrganizationId, string Username)
@@ -55,7 +52,8 @@ namespace UserManager.Services
             if (CodeIsValid(result.StatusCode))
             {
                 result = await CreateUser(dto.OrganizationId, dto.Username);
-                if(result.Status || UserIsExist(result.Code)) {
+                if (result.Status || UserIsExist(result.Code))
+                {
                     result = await GenerateToken(dto.OrganizationId, dto.Username);
                 }
             }

@@ -63,6 +63,19 @@ namespace Fetch
             return GetRequestResult(response);
         }
 
+        public async Task<Result> Post(string url, object? data = null)
+        {
+            FetchRequestOptions options = new()
+            {
+                Url = url,
+                Data = data
+            };
+            options.BaseUrl = string.IsNullOrEmpty(options.BaseUrl) ? _options.BaseUrl : options.BaseUrl;
+            AddHeaders(options.Headers);
+            using var response = await _httpClient.PostAsync(options.FullUrl, options.Content);
+            return GetRequestResult(response);
+        }
+
         public async Task<T?> GetData<T>(HttpResponseMessage response)
         {
             using var contentStream = await response.Content.ReadAsStreamAsync();

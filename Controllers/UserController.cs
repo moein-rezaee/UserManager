@@ -1,8 +1,10 @@
+using System.Net.Http.Headers;
 using CustomResponce;
 using CustomResponce.Models;
 using Fetch;
 using FluentValidation;
 using Mapster;
+using Microsoft.AspNetCore.Http.Headers;
 using Microsoft.AspNetCore.Mvc;
 using UserManager.Common;
 using UserManager.DTOs;
@@ -12,7 +14,7 @@ using UserManager.ViewModels;
 namespace MyApp.Namespace
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("[action]")]
 
     public class UserController : ControllerBase
     {
@@ -31,17 +33,16 @@ namespace MyApp.Namespace
             _httpClientFactory = httpClientFactory;
             _verifyValidator = verifyValidator;
 
-                string baseUrl = "http://localhost:5227";
-                FetchHttpRequest fetch = FetchHttpRequest.GetInstance(_httpClientFactory, baseUrl);
-                _service = new VerifyService(fetch);
+            string baseUrl = "http://localhost:5227";
+            FetchHttpRequest fetch = FetchHttpRequest.GetInstance(_httpClientFactory, baseUrl);
+            _service = new VerifyService(fetch);
         }
 
-        [HttpGet("{code}")]
-        public async Task<IActionResult> Verify(string code, [FromHeader] VerifyViewModel item)
+
+        [HttpPost]
+        public async Task<IActionResult> Verify(VerifyDto dto)
         {
             var result = new Result();
-            var dto = item.Adapt<VerifyDto>();
-            dto.Code = code;
             try
             {
                 // Validation
