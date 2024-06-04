@@ -1,19 +1,18 @@
 using System.Reflection;
 using FluentValidation;
+using UserManager.Mappings;
 
-var builder = WebApplication.CreateBuilder(args);
+WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-
-builder.Services.AddControllers();
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
-builder.Services.AddSwaggerGen();
 builder.Services.AddHttpClient();
+builder.Services.AddControllers();
+builder.Services.AddSwaggerGen();
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.RegisterMapsterConfiguration();
+builder.Services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
 
-var app = builder.Build();
+WebApplication app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();

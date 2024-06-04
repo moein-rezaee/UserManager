@@ -3,7 +3,7 @@ using UserManager.DTOs;
 
 namespace UserManager.Validations
 {
-    public class VerifyValidator: AbstractValidator<VerifyDto>
+    public class VerifyValidator : AbstractValidator<VerifyDto>
     {
         public VerifyValidator()
         {
@@ -11,7 +11,7 @@ namespace UserManager.Validations
                 .NotEmpty()
                 .NotNull()
                 .Length(4, 4);
-            
+
             RuleFor(i => i.OrganizationId)
                 .NotEmpty()
                 .NotNull();
@@ -21,6 +21,6 @@ namespace UserManager.Validations
                 .NotNull()
                 .Length(3, 50);
         }
-        
+
     }
 }

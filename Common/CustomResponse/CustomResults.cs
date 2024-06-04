@@ -1,7 +1,7 @@
 
-using CustomResponce.Models;
+using CustomResponse.Models;
 
-namespace CustomResponce
+namespace CustomResponse
 {
     public class CustomResults
     {

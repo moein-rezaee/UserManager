@@ -1,6 +1,6 @@
 using System.Text.Json;
-using CustomResponce;
-using CustomResponce.Models;
+using CustomResponse;
+using CustomResponse.Models;
 
 namespace Fetch
 {

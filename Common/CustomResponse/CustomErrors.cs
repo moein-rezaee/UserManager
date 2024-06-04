@@ -1,6 +1,6 @@
-using CustomResponce.Models;
+using CustomResponse.Models;
 
-namespace CustomResponce
+namespace CustomResponse
 {
     public class CustomErrors
     {
@@ -26,6 +26,18 @@ namespace CustomResponce
             },
             Data = data,
             StatusCode = (int)data.StatusCode,
+            Status = false
+        };
+
+        public static Result SendCodeFailed(object? data = null) => new()
+        {
+            Message = new Message()
+            {
+                Fa = "خطا هنگام ارسال کد",
+                En = "Send Code Failed!"
+            },
+            Data = data,
+            StatusCode = StatusCodes.Status500InternalServerError,
             Status = false
         };
 

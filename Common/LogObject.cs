@@ -1,8 +1,8 @@
 using System;
-using CustomResponce.Models;
+using CustomResponse.Models;
 using NuGet.Protocol;
 
-namespace UserManager.Common 
+namespace UserManager.Common
 {
     public class LogObject
     {
@@ -14,20 +14,24 @@ namespace UserManager.Common
         public DateTime At { get; set; } = DateTime.UtcNow;
         public string Type { get; set; } = "Error";
 
-        public static string Info(Result result) {
-            return new LogObject() {
+        public static string Info(Result result)
+        {
+            return new LogObject()
+            {
                 Message = result.Message.En,
                 Data = result
             }.ToJson();
-        } 
+        }
 
-        public static string Error(Exception e) {
-            return new LogObject() {
+        public static string Error(Exception e)
+        {
+            return new LogObject()
+            {
                 Message = $" [Message]: {e.Message} [InnerException] => {e.InnerException}",
                 Data = e,
                 Type = "Information"
             }.ToJson();
-        } 
+        }
     }
 }
 
