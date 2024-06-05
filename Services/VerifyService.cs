@@ -16,7 +16,7 @@ namespace UserManager.Services
             return await _fetch.Post(Url, dto);
         }
 
-        private async Task<Result> SendCode(SendDto dto)
+        private async Task<Result> SendCode(SendCodeDto dto)
         {
             string Url = $@"/api/otp/v1/send-code";
             return await _fetch.Post(Url, dto);
