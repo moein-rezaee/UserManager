@@ -1,7 +1,6 @@
 using CustomResponse.Models;
 using Fetch;
 using Mapster;
-using OTPService.DTOs;
 using UserManager.DTOs;
 
 
@@ -11,7 +10,7 @@ namespace UserManager.Services
     {
         private FetchHttpRequest _fetch { get; init; } = fetch;
 
-        private async Task<Result> VerifyCode(VerifyDto dto)
+        private async Task<Result> VerifyCode(VerifyCodeDto dto)
         {
             string Url = $@"/api/otp/v1/verify-code";
             return await _fetch.Post(Url, dto);
