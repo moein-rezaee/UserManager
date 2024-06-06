@@ -30,7 +30,7 @@ namespace UserManager.Services
 
         private async Task<Result> CreateUser(Guid OrganizationId, string Username)
         {
-            string Url = $@"/api/authenticate/v1/user/create";
+            string Url = $@"/api/authenticate/v1/user/create-user";
             GenerateTokenDto Data = new()
             {
                 OrganizationId = OrganizationId,
