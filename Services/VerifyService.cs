@@ -10,24 +10,31 @@ namespace UserManager.Services
     {
         private FetchHttpRequest _fetch { get; init; } = fetch;
 
+        private async Task<Result> GetFinalResult(Result result)
+        {
+            Result? resFrom = await _fetch.GetData<Result>(result.Data);
+            return resFrom ?? result;
+        }
+
         private async Task<Result> VerifyCode(VerifyCodeDto dto)
         {
             string Url = $@"/api/otp/v1/verify-code";
             Result result = await _fetch.Post(Url, dto);
-            Result? resFrom = await _fetch.GetData<Result>(result.Data);
-            return resFrom ?? result;
+            return await GetFinalResult(result);
         }
 
         private async Task<Result> SendCode(SendCodeDto dto)
         {
             string Url = $@"/api/otp/v1/send-code";
-            return await _fetch.Post(Url, dto);
+            Result result = await _fetch.Post(Url, dto);
+            return await GetFinalResult(result);
         }
 
         private async Task<Result> Organization(Guid id)
         {
             string Url = $@"/api/authenticate/v1/organization/{id}";
-            return await _fetch.Get(Url);
+            Result result = await _fetch.Get(Url);
+            return await GetFinalResult(result);
         }
 
         private async Task<Result> CreateUser(Guid OrganizationId, string Username)
@@ -39,7 +46,9 @@ namespace UserManager.Services
                 Username = Username,
                 Password = Username
             };
-            return await _fetch.Post(Url, Data);
+            Result result = await _fetch.Post(Url, Data);
+            return await GetFinalResult(result);
+
         }
 
         private async Task<Result> GenerateToken(Guid OrganizationId, string Username)
@@ -54,7 +63,8 @@ namespace UserManager.Services
                     Password = Username
                 }
             };
-            return await _fetch.Post(options);
+            Result result = await _fetch.Post(options);
+            return await GetFinalResult(result);
         }
 
         public bool UserIsExist(int? Code) => Code is not null && Code == 200;
