@@ -1,6 +1,7 @@
 using System.Text.Json;
 using CustomResponse;
 using CustomResponse.Models;
+using NuGet.Protocol;
 
 namespace Fetch
 {
@@ -76,8 +77,11 @@ namespace Fetch
             return GetRequestResult(response);
         }
 
-        public async Task<T?> GetData<T>(HttpResponseMessage response)
+        public async Task<T?> GetData<T>(object? res)
         {
+            if (res is null)
+                return default;
+            HttpResponseMessage response = res.ToString().FromJson<HttpResponseMessage>();
             using var contentStream = await response.Content.ReadAsStreamAsync();
             if (contentStream != null)
             {
@@ -96,9 +100,11 @@ namespace Fetch
 
         private Result GetRequestResult(HttpResponseMessage response)
         {
+            string res = response.ToJson();
+            int statusCode = (int)response.StatusCode;
             if (response.IsSuccessStatusCode)
-                return CustomResults.HttpRequestOk(response);
-            return CustomErrors.HttpRequestFailed(response);
+                return CustomResults.HttpRequestOk(res, statusCode);
+            return CustomErrors.HttpRequestFailed(res, statusCode);
         }
 
     }

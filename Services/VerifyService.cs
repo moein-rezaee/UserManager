@@ -13,7 +13,9 @@ namespace UserManager.Services
         private async Task<Result> VerifyCode(VerifyCodeDto dto)
         {
             string Url = $@"/api/otp/v1/verify-code";
-            return await _fetch.Post(Url, dto);
+            Result result = await _fetch.Post(Url, dto);
+            Result? resFrom = await _fetch.GetData<Result>(result.Data);
+            return resFrom ?? result;
         }
 
         private async Task<Result> SendCode(SendCodeDto dto)

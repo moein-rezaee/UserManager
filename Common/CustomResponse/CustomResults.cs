@@ -6,7 +6,7 @@ namespace CustomResponse
     public class CustomResults
     {
 
-        public static Result HttpRequestOk(HttpResponseMessage data) => new()
+        public static Result HttpRequestOk(string data, int statusCode) => new()
         {
             Message = new Message()
             {
@@ -14,7 +14,7 @@ namespace CustomResponse
                 En = "Good Job. Result is Ok!"
             },
             Data = data,
-            StatusCode = (int)data.StatusCode,
+            StatusCode = statusCode,
         };
     }
 }

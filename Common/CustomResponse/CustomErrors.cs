@@ -17,7 +17,7 @@ namespace CustomResponse
         };
 
 
-        public static Result HttpRequestFailed(HttpResponseMessage data) => new()
+        public static Result HttpRequestFailed(string data, int statusCode) => new()
         {
             Message = new Message()
             {
@@ -25,7 +25,7 @@ namespace CustomResponse
                 En = "Send Http Request Failed!"
             },
             Data = data,
-            StatusCode = (int)data.StatusCode,
+            StatusCode = statusCode,
             Status = false
         };
 
