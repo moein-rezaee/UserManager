@@ -23,6 +23,15 @@ namespace UserManager.Common
             }.ToJson();
         }
 
+        public static string Info(string message, object? data = null)
+        {
+            return new LogObject()
+            {
+                Message = message,
+                Data = data
+            }.ToJson();
+        }
+
         public static string Error(Exception e)
         {
             return new LogObject()

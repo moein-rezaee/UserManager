@@ -36,7 +36,8 @@ namespace MyApp.Namespace
             _verifyValidator = verifyValidator;
             _sendValidator = sendValidator;
 
-            string? baseUrl = _config.GetSection("BaseGatewayUrl").Value;
+            string? baseUrl = _config.GetValue<string>("BaseUrl");
+            _logger.LogInformation(LogObject.Info(baseUrl));
             FetchHttpRequest fetch = FetchHttpRequest.GetInstance(_httpClientFactory, baseUrl);
             _service = new VerifyService(fetch);
         }
