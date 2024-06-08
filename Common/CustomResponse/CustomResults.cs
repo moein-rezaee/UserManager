@@ -6,7 +6,7 @@ namespace CustomResponse
     public class CustomResults
     {
 
-        public static Result HttpRequestOk(string data, int statusCode) => new()
+        public static Result HttpRequestOk(object? data, int statusCode) => new()
         {
             Message = new Message()
             {

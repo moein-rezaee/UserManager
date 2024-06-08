@@ -1,4 +1,3 @@
-using System.Text.Json;
 using CustomResponse;
 using CustomResponse.Models;
 using NuGet.Protocol;
@@ -44,7 +43,7 @@ namespace Fetch
             };
             options.BaseUrl = string.IsNullOrEmpty(options.BaseUrl) ? _options.BaseUrl : options.BaseUrl;
             AddHeaders(options.Headers);
-            var response = await _httpClient.GetAsync(options.FullUrl);
+            HttpResponseMessage response = await _httpClient.GetAsync(options.FullUrl);
             return GetRequestResult(response);
         }
 
@@ -52,7 +51,7 @@ namespace Fetch
         {
             options.BaseUrl = string.IsNullOrEmpty(options.BaseUrl) ? _options.BaseUrl : options.BaseUrl;
             AddHeaders(options.Headers);
-            var response = await _httpClient.GetAsync(options.FullUrl);
+            HttpResponseMessage response = await _httpClient.GetAsync(options.FullUrl);
             return GetRequestResult(response);
         }
 
@@ -60,7 +59,7 @@ namespace Fetch
         {
             options.BaseUrl = string.IsNullOrEmpty(options.BaseUrl) ? _options.BaseUrl : options.BaseUrl;
             AddHeaders(options.Headers);
-            using var response = await _httpClient.PostAsync(options.FullUrl, options.Content);
+            HttpResponseMessage response = await _httpClient.PostAsync(options.FullUrl, options.Content);
             return GetRequestResult(response);
         }
 
@@ -73,7 +72,7 @@ namespace Fetch
             };
             options.BaseUrl = string.IsNullOrEmpty(options.BaseUrl) ? _options.BaseUrl : options.BaseUrl;
             AddHeaders(options.Headers);
-            using var response = await _httpClient.PostAsync(options.FullUrl, options.Content);
+            HttpResponseMessage response = await _httpClient.PostAsync(options.FullUrl, options.Content);
             return GetRequestResult(response);
         }
 
@@ -81,14 +80,15 @@ namespace Fetch
         {
             if (res is null)
                 return default;
-            HttpResponseMessage response = res.ToString().FromJson<HttpResponseMessage>();
-            using var contentStream = await response.Content.ReadAsStreamAsync();
-            if (contentStream != null)
-            {
-                T? data = await JsonSerializer.DeserializeAsync<T>(contentStream);
-                return data;
-            }
-            return default;
+
+            HttpResponseMessage response = res as HttpResponseMessage;
+            string responseBody = await response.Content.ReadAsStringAsync();
+
+            if (string.IsNullOrEmpty(responseBody))
+                return default;
+
+            T data = responseBody.FromJson<T>();
+            return data;
         }
 
         private void AddHeaders(List<FetchHttpHeader>? headers)
@@ -100,11 +100,11 @@ namespace Fetch
 
         private Result GetRequestResult(HttpResponseMessage response)
         {
-            string res = response.ToJson();
             int statusCode = (int)response.StatusCode;
+
             if (response.IsSuccessStatusCode)
-                return CustomResults.HttpRequestOk(res, statusCode);
-            return CustomErrors.HttpRequestFailed(res, statusCode);
+                return CustomResults.HttpRequestOk(response, statusCode);
+            return CustomErrors.HttpRequestFailed(response, statusCode);
         }
 
     }

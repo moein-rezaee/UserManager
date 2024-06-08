@@ -17,7 +17,7 @@ namespace CustomResponse
         };
 
 
-        public static Result HttpRequestFailed(string data, int statusCode) => new()
+        public static Result HttpRequestFailed(object? data, int statusCode) => new()
         {
             Message = new Message()
             {
