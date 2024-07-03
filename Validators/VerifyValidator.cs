@@ -1,5 +1,6 @@
 using FluentValidation;
 using UserManager.DTOs;
+using UserManager.Enums;
 
 namespace UserManager.Validations
 {
@@ -7,6 +8,8 @@ namespace UserManager.Validations
     {
         public VerifyValidator()
         {
+            RuleFor(i => i.Type).IsInEnum();
+
             RuleFor(i => i.Code)
                 .NotEmpty()
                 .NotNull()
@@ -19,7 +22,13 @@ namespace UserManager.Validations
             RuleFor(i => i.Username)
                 .NotEmpty()
                 .NotNull()
-                .Length(3, 50);
+
+                .Matches(@"^(\+98|0)?9\d{9}$")
+                .WithMessage("Phone number is Not Valid!")
+                .When(i => i.Type == VerifyType.Phone)
+
+                .EmailAddress()
+                .When(i => i.Type == VerifyType.Email);
         }
 
     }

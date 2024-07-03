@@ -7,8 +7,11 @@ using UserManager.Common;
 using FluentValidation.Results;
 using UserManager.DTOs;
 using UserManager.Services;
+using UserManager.Enums;
+using Mapster;
+using UserManager.Common.CustomResponse;
 
-namespace MyApp.Namespace
+namespace UserManager.Controllers
 {
     [ApiController]
     [Route("[action]")]
@@ -20,43 +23,86 @@ namespace MyApp.Namespace
         private readonly ILogger<UserController> _logger;
         private readonly IHttpClientFactory _httpClientFactory;
         private readonly IValidator<VerifyDto> _verifyValidator;
-        private readonly IValidator<SendDto> _sendValidator;
-        private readonly VerifyService _service;
+        private readonly IValidator<LoginDto> _loginValidator;
+        private readonly IValidator<RegisterDto> _registerValidator;
+        private readonly AuthenticateService _authenticateService;
+        private readonly VerifyService _verifyService;
 
         public UserController(
             IConfiguration config,
             ILogger<UserController> logger,
             IValidator<VerifyDto> verifyValidator,
-            IValidator<SendDto> sendValidator,
+            IValidator<LoginDto> loginValidator,
+            IValidator<RegisterDto> registerValidator,
             IHttpClientFactory httpClientFactory)
         {
             _config = config;
             _logger = logger;
             _httpClientFactory = httpClientFactory;
             _verifyValidator = verifyValidator;
-            _sendValidator = sendValidator;
+            _loginValidator = loginValidator;
+            _registerValidator = registerValidator;
 
             string? baseUrl = _config.GetValue<string>("BaseUrl");
-            _logger.LogInformation(LogObject.Info(baseUrl));
             FetchHttpRequest fetch = FetchHttpRequest.GetInstance(_httpClientFactory, baseUrl);
-            _service = new VerifyService(fetch);
+
+            _authenticateService = new AuthenticateService(fetch);
+            _verifyService = new VerifyService(fetch);
         }
 
         [HttpPost]
-        public async Task<IActionResult> Send(SendDto dto)
+        public async Task<IActionResult> Register(RegisterDto dto)
+        {
+            Result result = new();
+            try
+            {
+                ValidationResult check = _registerValidator.Validate(dto);
+                if (!check.IsValid)
+                {
+                    result = CustomErrors.InvalidInputData(check.Errors.Adapt<List<ValidationError>>());
+                    return StatusCode(result.StatusCode, result);
+                }
+
+                result = await _authenticateService.AddUser(dto);
+
+
+                _logger.LogInformation(LogObject.Info(result));
+                return StatusCode(result.StatusCode, result);
+            }
+            catch (Exception e)
+            {
+                _logger.LogInformation(LogObject.Error(e));
+                result = CustomErrors.SendCodeFailed();
+                return StatusCode(result.StatusCode, result);
+            }
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> Login(LoginDto dto)
         {
             Result result = new();
             try
             {
                 // Validation
-                ValidationResult check = _sendValidator.Validate(dto);
+                ValidationResult check = _loginValidator.Validate(dto);
                 if (!check.IsValid)
                 {
-                    result = CustomErrors.InvalidInputData();
+                    result = CustomErrors.InvalidInputData(check.Errors.Adapt<List<ValidationError>>());
                     return StatusCode(result.StatusCode, result);
                 }
 
-                result = await _service.Send(dto);
+                switch (dto.Type)
+                {
+                    case LoginType.Password:
+                        result = await _authenticateService.GenerateToken(dto.Adapt<GenerateTokenDto>());
+                        break;
+                    case LoginType.Phone:
+                        result = await _verifyService.Sms(dto.Adapt<SendDto>());
+                        break;
+                    case LoginType.Email:
+                        result = await _verifyService.Email(dto.Adapt<SendDto>());
+                        break;
+                }
 
                 _logger.LogInformation(LogObject.Info(result));
                 return StatusCode(result.StatusCode, result);
@@ -82,7 +128,7 @@ namespace MyApp.Namespace
                     return StatusCode(result.StatusCode, result);
                 }
 
-                result = await _service.Verify(dto);
+                result = await _verifyService.Verify(dto);
 
                 _logger.LogInformation(LogObject.Info(result));
                 return StatusCode(result.StatusCode, result);

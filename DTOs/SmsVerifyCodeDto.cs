@@ -1,6 +1,6 @@
 namespace UserManager.DTOs
 {
-    public class VerifyCodeDto
+    public class SmsVerifyCodeDto
     {
         public required Guid OrganizationId { get; set; }
         public required string Mobile { get; set; }
